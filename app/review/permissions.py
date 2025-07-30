@@ -6,4 +6,5 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         # 로그인해야 읽기 가능
+
         return obj.user_id == request.user 
