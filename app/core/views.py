@@ -21,7 +21,6 @@ def get_csrf_token(request):
 
 #모든 API에 @csrf_exempt가 적용되어 있습니다.
 #REST API라면 괜찮지만, 보안상 주의가 필요합니다.
-
 # 요청 시 로그인
 @csrf_exempt  # CSRF 보호를 비활성화하기 위한 데코레이터이나, REST API라면 필요에 따라 제거 가능
 class UserLoginView(generics.GenericAPIView):
