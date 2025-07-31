@@ -2,6 +2,7 @@ FROM python:3.13-alpine
 LABEL maintainer="oscar2272"
 
 ENV PYTHONUNBUFFERED 1
+ENV DJANGO_DEVELOPMENT=true
 
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt

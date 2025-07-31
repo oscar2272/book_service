@@ -13,22 +13,49 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY','changeme')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'changeme')
 DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
+
+# CORS 설정
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]  # 프론트엔드 주소
+
+# 세션 / CSRF 쿠키 설정
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'  # 세션을 쿠키에 서명 저장
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_NAME = 'sessionid'
+
+if os.getenv("DJANGO_DEVELOPMENT") == "true":
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = "Lax"  # 혹은 "Strict"
+    SESSION_COOKIE_SAMESITE = "Lax"
+else:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SAMESITE = "None"
+
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,15 +69,16 @@ INSTALLED_APPS = [
     'drf_spectacular',
     "review",
     "book",
-
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # 세션 미들웨어 먼저
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 인증 미들웨어 다음
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -132,11 +160,18 @@ STATIC_ROOT = '/vol/web/static'
 
 
 REST_FRAMEWORK = {
-  'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
 }
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+
 SPECTACULAR_SETTINGS = {
-  'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # Default primary key field type
