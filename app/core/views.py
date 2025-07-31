@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from .serializers import UsersSerializer, RegistrationSerializer
 from django.contrib.auth import authenticate
-
+from django.contrib.auth import login, logout
 
 # 요청 시 CSRF 토큰 반환
 @ensure_csrf_cookie
@@ -44,6 +44,7 @@ class UserLoginView(generics.GenericAPIView):
         # 예: from authentication.models import User
         # user = authenticate(username=username, password=password, user_model=User)
         if user is not None:
+            login(request, user)
             # 만약, 토큰 발급이 필요하다면 여기서 발급 (예: SimpleJWT 등)
             return Response({"message": "로그인에 성공하였습니다."}, status=status.HTTP_200_OK)
         return Response({"error": "아이디 또는 비밀번호가 올바르지 않습니다."}, status=status.HTTP_401_UNAUTHORIZED)
@@ -57,6 +58,7 @@ class UserLogoutView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         # 로그아웃 로직 구현
+        logout(request)
         return Response({"message": "로그아웃 되었습니다."}, status=status.HTTP_200_OK)
 
 
