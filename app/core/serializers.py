@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 # from authentication.models import User  # 모델에 별도 User가 정의되어 있다면 사용
 
+
 # User 시리얼라이저(로그인, 로그아웃)(회원가입에 사용도 가능)
 class UsersSerializer(serializers.ModelSerializer):
     password = serializers.CharField(many=True, write_only=True)
