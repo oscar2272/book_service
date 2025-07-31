@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from book.views import AuthorViewSet
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +28,8 @@ urlpatterns = [
     path('api/books/', include('book.urls')),
     path('api/reviews/', include('review.urls')),
     path('api/', include('core.urls')),
+
+    path('api/authors/', AuthorViewSet.as_view({'get': 'list', 'post': 'create'}), name='author-list-create'),
 ]
+
 

@@ -1,44 +1,48 @@
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions
 # from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import PageNumberPagination
-from .models import Book
+from .models import Book, Author
 from .serializers import (
     BookListSerializer,
     BookCreateSerializer,
     BookDetailSerializer,
-    BookUpdateSerializer
+    BookUpdateSerializer,
+    AuthorCreateSerializer
 )
-
+from django.db.models import Q
+from rest_framework import viewsets
 class BookPagination(PageNumberPagination):
     page_size = 10
-    
+
 #1. 도서 목록 조회
-class BookListView(generics.ListAPIView):
+class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
-    serializer_class = BookListSerializer
     pagination_class = BookPagination
-    # filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    search_fields = ['title', 'author__name']  
-    ordering_fields = ['published_at']  
-    ordering = ['average_rating','published_at']  
-    permission_classes = [permissions.AllowAny]
-    
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BookListSerializer
+        return BookCreateSerializer
+
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Book.objects.all()
+        keyword = self.request.query_params.get('search')
         ordering = self.request.query_params.get('ordering')
 
-        if not ordering:
-            return queryset.order_by('-published_at')
-        
-        return queryset
+        if keyword:
+            queryset = queryset.filter(Q(title__icontains=keyword) | Q(author__name__icontains=keyword))
 
-#2. 도서 등록
-class BookCreateView(generics.CreateAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+        if ordering:
+            return queryset.order_by(ordering)
+        return queryset.order_by('-published_at')
 
-#3. 도서 상세 조회
+    def create(self, request, *args, **kwargs):
+        print("[BookViewSet] create called with data:", request.data)
+        response = super().create(request, *args, **kwargs)
+        print("[BookViewSet] create response status:", response.status_code)
+        return response
+
+#3. 도서 상세 조회 (nested serializer 사용)
 class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookDetailSerializer
@@ -54,3 +58,9 @@ class BookUpdateView(generics.UpdateAPIView):
 class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+
+# 저자 등록,저자 목록 조회
+class AuthorViewSet(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorCreateSerializer
+
