@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from . models import Author, Book
+from review.serializers import ReviewSerializer
 
 class AuthorSerializer(serializers.ModelSerializer): # 저자 정보
       class Meta:

@@ -6,4 +6,5 @@ from . import views
 urlpatterns = [
     path('', views.ReviewListCreate.as_view()),
     path('<int:pk>/', views.ReviewRetrieveUpdateDestroy.as_view()),
+
 ]

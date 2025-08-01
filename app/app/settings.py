@@ -35,7 +35,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]  # 프론트엔드 주소
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"
+                            "http://localhost:3000",
+    "http://127.0.0.1:3000",
+                        ]  # 프론트엔드 주소
 
 # 세션 / CSRF 쿠키 설정
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'  # 세션을 쿠키에 서명 저장
